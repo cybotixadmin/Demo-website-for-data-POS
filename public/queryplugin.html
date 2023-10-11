@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirect Based on Query Parameter</title>
+  
+</head>
+<body>
+
+  <h1>Redirect Based on Query Parameter</h1>
+  <p>If a valid "redirect" parameter is found in the query string, you will be redirected to the appropriate website.</p>
+This a sample of a page that can effect the desired functionlity for determining whether or not a browser has the Cybotix plugin installed.
+A zero-sized ifram calls this page. When the browser loads the ifram, it will also load this page, but not in a way that will affect the user experience
+<p>When this URI is called, the http header X_HTTP_CYBOTIX_QUERY_PLUGIN is attached, with a token from Cybotix as the value. 
+    This token is customized for triggering a response from the plugin</p>The reponse from the plugin includes the http header "X_HTTP_CYBOTIX_PLUGIN: true"
+If there is no such header in the response, the plugin is not present. 
+Additional actions can then be taken based on this information. 
+</body>
+</html>
