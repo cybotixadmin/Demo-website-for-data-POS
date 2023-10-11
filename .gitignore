@@ -133,5 +133,5 @@ dist
 Dockerfile
 notes.txt
 .dockerignore
-node_modules
+
 
