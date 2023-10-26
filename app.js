@@ -4,11 +4,17 @@ const app = express();
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-
+//import fetch from 'node-fetch';
+//const fetch = require('node-fetch');
+const https = require('https');
+const http = require('http');
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Set the view engine to ejs
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
 require('./routes')(app);
 
@@ -17,6 +23,12 @@ require('./routes/platform')(app);
 require('./routes/plugin')(app);
 require('./routes/serve_data')(app);
 
+try{
+  app.use(express.json());
+//  app.use(express.bodyParser());
+  }catch(e){
+    console.log(e);
+  }
 
 // Route to serve the text file
 app.get('/file_one.js', (req, res) => {
