@@ -1,5 +1,5 @@
 # Use Node.js image
-FROM node:14
+FROM node:16
 
 # Create and set a working directory
 WORKDIR /usr/src/app
@@ -18,5 +18,4 @@ EXPOSE 6000
 
 # Command to run the application
 CMD ["node", "app.js"]
-
 

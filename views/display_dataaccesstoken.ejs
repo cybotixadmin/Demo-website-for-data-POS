@@ -51,6 +51,24 @@ Validate the signature with the public key below
             <li>Paste the timestamp into the converter to see the corresponding date and time.</li>
         </ul>
 </ol>
-
+<p><strong>Data:</strong></p>
+<table border="1">
+  <!-- Table Header -->
+  <thead>
+      <tr>
+          <th>time</th>
+          <th>URL</th>
+      </tr>
+  </thead>
+  <!-- Table Body -->
+  <tbody>
+    <% data.forEach((item) => { %>
+      <tr>
+          <td><%= item.utc %></td>
+          <td><%= item.url %></td>
+      </tr>
+  <% }); %>
+</tbody>
+</table>
 </body>
 </html>

@@ -1,5 +1,6 @@
 
 const express = require('express');
+const axios = require('axios');
 
 const fs = require('fs');
 const http = require('http');
@@ -90,59 +91,88 @@ module.exports = function (app) {
             // then use it to make a request to the remote website
             // and display the results
             console.log("data grant");
-            const data_grant = JSON.parse(base642str(parsedPayload.grant));
+            const data_grant = JSON.parse(base64decode(parsedPayload.grant));
             console.log(data_grant);
             console.log("data grant subject");
             console.log(data_grant.data_subject);
             console.log("data grant req");
             console.log(data_grant.grants);
 
-            var location = parsedPayload.aud;
-            console.log("location: " + location);
-            res.render('display_dataaccesstoken', {
+            const data_location_url = parsedPayload.aud;
+            console.log("data_location_url: " + data_location_url);
+        // create output objects
+
+            console.log(splitUrl(data_location_url));
+const endpoint = splitUrl(data_location_url);
+
+            const options = {
+                hostname: endpoint.domain,
+                path: endpoint.path,
+                port: endpoint.port,
+                method: 'GET',
+                headers: {
+                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': platformtoken,
+                    'User-Agent': 'Node.js/14.0', 
+                    'X_HTTP_CYBOTIX_PLATFORM_TOKEN': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmN5Ym90aXgubm8iLCJzdWIiOiJjb3JwIGluYyIsImF1ZCI6IkN5Ym90aXgiLCJrZXkiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cclxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwVElCM1Z0VmhDTUFKZ1hlZlc1T1xyXG4wNk4zVU5YY0VqSzNYYTNSd0Z1UDU2eDRTc2h5b05CVDFzOWtaY09wTGI5Wm5zWWxhMlVFYlRVSmpRT091T1JhXHJcbmFYT3hEbHF0ekVYc1BienNxTkhJRTZBVm1RTWFYK041VnlBVjBFM3IwaHNUL2lGUmJ5VXZSWTRGanpHMTdKeWVcclxuU0U2aWpveHpGNVpSN1RMdzgxZm1KUFIreTdFamtKQWEvNG54NWNEa3ZlNFdhZ0YyVVFlV3NzVG52RjlQUHNHelxyXG5RaktJZEpNYTdXbzF5RWJKSW5oUGUzWVNvOER4bnd0RzRHMnFYR29KK1FmeXRpTW1BeDZwL2puNW9vUCtzaWoxXHJcbmRydHRsS3BNRWg4WmtQZnpnNTNQYWt4OFdvOWpxWmNjOU1wYTZueVo4WmEwOVdWMWFyMzRhTXNPQ2JLdGFPSjZcclxuR1FJREFRQUJcclxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXHJcbiJdLCJqdGkiOiJhOTRhMzFkOC0wMDA5LTQwMzMtYTUwZi1kMWM3ZWUzYWU1OTAiLCJpYXQiOjE2OTgyNjM4NjUsIm5iZiI6MTY5ODI2Mzg2NSwiZXhwIjoxNzAwODU1ODY1fQ.B2SfzzvvJlqAKXFTuyy1FXwXWH9JPRJgFPCJ441vHw2JBnSDJApDtuE-ZzV2hPECjgEld58V-cgEmVXwq8oB8A' ,
+                    'X_HTTP_CYBOTIX_DATA_REQUEST': datarequest
+                }
+            };
+            console.log("make call to " );
+console.log(options);
+const regexp_http = new RegExp('^http');
+const regexp_https = new RegExp('https://');
+console.log((regexp_http.test(data_location_url)));
+console.log((regexp_https.test(data_location_url)));
+
+if (regexp_http.test(data_location_url)) {
+    console.log("http url");
+
+
+
+            http.get(options, (data_res) => {
+                let data = '';
+
+                // A chunk of data has been received.
+                data_res.on('data', (chunk) => {
+                    data += chunk;
+                    console.log(data);
+
+                });
+                // The whole response has been received. Print out the result.
+                var parsedData;
+                data_res.on('end', () => {
+                    try {
+                        parsedData = JSON.parse(data);
+                        console.log(parsedData);
+                    } catch (e) {
+                        console.error("Error parsing the response data:", e.message);
+                    }
+                    console.log("######");
+                    console.log(   parsedData)
+                        res.render('display_dataaccesstoken', {
                 token: platformtoken,
                 decodedHeader: decodedHeader,
                 parsedPayload: parsedPayload,
                 datagrant_subject: data_grant.data_subject,
                 datagrant_requests: data_grant.grants,
                 signature: signature,
-                publicKey: config.signature_validation_key
+                publicKey: config.signature_validation_key,
+                data: parsedData
             });
-            const options = {
-                hostname: 'localhost',
-                path: '/data',
-                port: 3000,
-                method: 'GET',
-                headers: {
-                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': platformtoken,
-                    'User-Agent': 'Node.js/14.0', // Just an example User-Agent header
-                    'X_HTTP_CYBOTIX_DATA_REQUEST': datarequest
-                }
-            };
-
-            http.get(options, (res) => {
-                let data = '';
-
-                // A chunk of data has been received.
-                res.on('data', (chunk) => {
-                    data += chunk;
-                    console.log(data);
+                    console.log("data read back from server");
 
                 });
-                // The whole response has been received. Print out the result.
-                res.on('end', () => {
-                    try {
-                        const parsedData = JSON.parse(data);
-                        console.log(parsedData);
-                    } catch (e) {
-                        console.error("Error parsing the response data:", e.message);
-                    }
-                });
-                console.log("data read back from server");
+                console.log("end");
 
             }).on("error", (err) => {
                 console.error("Error making the request:", err.message);
             });
+
+        }else{
+            console.log("https url");
+        }
+        
+
 
         } catch (e) {
             console.error(e);
@@ -151,8 +181,48 @@ module.exports = function (app) {
 
 }
 
-function base642str(data) {
-    let buff = new Buffer(data, 'base64');
-    let text = buff.toString('ascii');
-    return text;
+
+function base64decode(data) {
+    return atob(data);
+  }
+
+
+function base64encode(str) {
+    return btoa(str);
 }
+
+
+function splitUrl(url) {
+    const regex = /^(https?):\/\/([^\/]+)(\/?.*)$/;
+    const result = url.match(regex);
+
+// is there a port number?
+var port = 80;
+var domain = result[2];
+if (/:/.test(result[2])) {
+console.log("port specified");
+    var parts = result[2].split(':');
+    var port = parts[1];
+    var domain = parts[0];
+    console.log("port: "+port);
+}else{
+    console.log("no port specified");
+    if (/https/i.test(result[1])){
+port = 443;
+
+    }
+}
+
+
+    if (result) {
+        return {
+            protocol: result[1],
+            domain: domain,
+            port: port,
+            path: result[3]
+        };
+    } else {
+        throw new Error('Invalid URL');
+    }
+}
+
