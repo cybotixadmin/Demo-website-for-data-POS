@@ -52,8 +52,10 @@ Validate the signature with the public key below
         </ul>
 </ol>
 <p><strong>Data:</strong></p>
+<% if(data && data.length > 0) { %>
 <table border="1">
   <!-- Table Header -->
+  
   <thead>
       <tr>
           <th>time</th>
@@ -62,6 +64,9 @@ Validate the signature with the public key below
   </thead>
   <!-- Table Body -->
   <tbody>
+   
+   
+
     <% data.forEach((item) => { %>
       <tr>
           <td><%= item.utc %></td>
@@ -70,5 +75,9 @@ Validate the signature with the public key below
   <% }); %>
 </tbody>
 </table>
+<% } else { %>
+  No data returned.
+ <% } %>
+
 </body>
 </html>
