@@ -56,9 +56,15 @@ module.exports = function (app) {
         console.log("querydata_response_page");
 
         try {
-            // access the data access token from the header
-            const platformtoken = req.get('X_HTTP_CYBOTIX_DATA_ACCESSTOKEN');
+
+            const platformtoken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmN5Ym90aXgubm8iLCJzdWIiOiJjb3JwIGluYyIsImF1ZCI6IkN5Ym90aXgiLCJrZXkiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cclxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwVElCM1Z0VmhDTUFKZ1hlZlc1T1xyXG4wNk4zVU5YY0VqSzNYYTNSd0Z1UDU2eDRTc2h5b05CVDFzOWtaY09wTGI5Wm5zWWxhMlVFYlRVSmpRT091T1JhXHJcbmFYT3hEbHF0ekVYc1BienNxTkhJRTZBVm1RTWFYK041VnlBVjBFM3IwaHNUL2lGUmJ5VXZSWTRGanpHMTdKeWVcclxuU0U2aWpveHpGNVpSN1RMdzgxZm1KUFIreTdFamtKQWEvNG54NWNEa3ZlNFdhZ0YyVVFlV3NzVG52RjlQUHNHelxyXG5RaktJZEpNYTdXbzF5RWJKSW5oUGUzWVNvOER4bnd0RzRHMnFYR29KK1FmeXRpTW1BeDZwL2puNW9vUCtzaWoxXHJcbmRydHRsS3BNRWg4WmtQZnpnNTNQYWt4OFdvOWpxWmNjOU1wYTZueVo4WmEwOVdWMWFyMzRhTXNPQ2JLdGFPSjZcclxuR1FJREFRQUJcclxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXHJcbiJdLCJqdGkiOiJhOTRhMzFkOC0wMDA5LTQwMzMtYTUwZi1kMWM3ZWUzYWU1OTAiLCJpYXQiOjE2OTgyNjM4NjUsIm5iZiI6MTY5ODI2Mzg2NSwiZXhwIjoxNzAwODU1ODY1fQ.B2SfzzvvJlqAKXFTuyy1FXwXWH9JPRJgFPCJ441vHw2JBnSDJApDtuE-ZzV2hPECjgEld58V-cgEmVXwq8oB8A'
+
             console.log("platformtoken: " + platformtoken);
+
+            // access the data
+            
+            const datatoken = req.get('X_HTTP_CYBOTIX_DATA_ACCESSTOKEN');
+            console.log("datatoken: " + datatoken);
 
             // parse it and dsiplay the contents.
 
@@ -71,7 +77,7 @@ module.exports = function (app) {
 
 
             // Splitting the JWT to get the header, payload, and signature
-            const[header, load, signature] = platformtoken.replace(/-/g, '+').replace(/_/g, '/').split('.');
+            const[header, load, signature] = datatoken.replace(/-/g, '+').replace(/_/g, '/').split('.');
             console.log("header: " + header);
             console.log("load: " + load);
             console.log("signature: " + signature);
@@ -111,9 +117,9 @@ const endpoint = splitUrl(data_location_url);
                 port: endpoint.port,
                 method: 'GET',
                 headers: {
-                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': platformtoken,
+                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': datatoken,
                     'User-Agent': 'Node.js/14.0', 
-                    'X_HTTP_CYBOTIX_PLATFORM_TOKEN': 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmN5Ym90aXgubm8iLCJzdWIiOiJjb3JwIGluYyIsImF1ZCI6IkN5Ym90aXgiLCJrZXkiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cclxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwVElCM1Z0VmhDTUFKZ1hlZlc1T1xyXG4wNk4zVU5YY0VqSzNYYTNSd0Z1UDU2eDRTc2h5b05CVDFzOWtaY09wTGI5Wm5zWWxhMlVFYlRVSmpRT091T1JhXHJcbmFYT3hEbHF0ekVYc1BienNxTkhJRTZBVm1RTWFYK041VnlBVjBFM3IwaHNUL2lGUmJ5VXZSWTRGanpHMTdKeWVcclxuU0U2aWpveHpGNVpSN1RMdzgxZm1KUFIreTdFamtKQWEvNG54NWNEa3ZlNFdhZ0YyVVFlV3NzVG52RjlQUHNHelxyXG5RaktJZEpNYTdXbzF5RWJKSW5oUGUzWVNvOER4bnd0RzRHMnFYR29KK1FmeXRpTW1BeDZwL2puNW9vUCtzaWoxXHJcbmRydHRsS3BNRWg4WmtQZnpnNTNQYWt4OFdvOWpxWmNjOU1wYTZueVo4WmEwOVdWMWFyMzRhTXNPQ2JLdGFPSjZcclxuR1FJREFRQUJcclxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXHJcbiJdLCJqdGkiOiJhOTRhMzFkOC0wMDA5LTQwMzMtYTUwZi1kMWM3ZWUzYWU1OTAiLCJpYXQiOjE2OTgyNjM4NjUsIm5iZiI6MTY5ODI2Mzg2NSwiZXhwIjoxNzAwODU1ODY1fQ.B2SfzzvvJlqAKXFTuyy1FXwXWH9JPRJgFPCJ441vHw2JBnSDJApDtuE-ZzV2hPECjgEld58V-cgEmVXwq8oB8A' ,
+                    'X_HTTP_CYBOTIX_PLATFORM_TOKEN': platformtoken,
                     'X_HTTP_CYBOTIX_DATA_REQUEST': datarequest
                 }
             };
