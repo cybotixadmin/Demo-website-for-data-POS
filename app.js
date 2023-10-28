@@ -8,6 +8,8 @@ const mysql = require('mysql');
 //const fetch = require('node-fetch');
 const https = require('https');
 const http = require('http');
+const configFile = fs.readFileSync('./config.json');
+const config = JSON.parse(configFile);
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -41,7 +43,7 @@ app.get('/file_one.js', (req, res) => {
 });
 
 
-const PORT = 3001;
+const PORT = config.port;
 app.listen(PORT, () => {
   console.log();
 });
