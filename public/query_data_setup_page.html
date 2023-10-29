@@ -1,0 +1,39 @@
+<html><head>
+    <meta charset="UTF-8">
+    <title>create a custom data query</title>
+</head>
+<body>
+
+<h2>Enter your platform token</h2>
+<form action="/gui_user_create_custom_datarequest" method="post">
+        <div style="margin-top: 20px;">
+        <label for="publicKey">Platform Token (JWT format, base64-url encoded):</label>
+        <textarea rows="5" cols="40" id="platformtoken" name="platformtoken" placeholder="AAA - plaform token -BBBB" required></textarea>
+    </div>
+
+
+    <div style="margin-top: 20px;">
+        <label for="publicKey">data request (JSON format, plaintext):</label>
+        <textarea id="publicKey" rows="5" cols="40" name="dataaccessrequest" placeholder="[{...},{...}]" required></textarea>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <label for="message">the message</label><br/>
+        <textarea id="messagetext" rows="5" cols="40" name="messagetext"  required>Can we see your click history for the past hour ?</textarea>
+    </div>
+
+<br/><b>The data request.</b>
+<pre>
+[
+{"requesttype":"clickhistory","requestdetails":{"time":"now-1hr","filter":".*power\.no.*"}},
+{"requesttype":"clickhistory","requestdetails":{"time":"now-1hr","filter":".*tool.*"}}
+]
+</pre>
+Where the messagetext field contain a base64 encoded text of the message to present to the user
+
+    <div style="margin-top: 20px;">
+        <input type="submit" value="Submit">
+    </div>
+</form>
+
+</body></html>

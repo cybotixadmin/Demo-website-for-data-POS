@@ -14,9 +14,14 @@ const config = JSON.parse(configFile);
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 // Set the view engine to ejs
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 require('./routes')(app);
 
@@ -25,22 +30,19 @@ require('./routes/platform')(app);
 require('./routes/plugin')(app);
 require('./routes/serve_data')(app);
 
+
 try{
   app.use(express.json());
-//  app.use(express.bodyParser());
+// parse application/x-www-form-urlencoded
+ //app.use(bodyParser.urlencoded({ extended: false }));
+ // parse application/json
+app.use(bodyParser.json());
+
   }catch(e){
     console.log(e);
   }
 
-// Route to serve the text file
-app.get('/file_one.js', (req, res) => {
-  const filePath = path.join(__dirname, 'file_one.js');
-  res.download(filePath, 'file_one.js', (err) => {
-    if (err) {
-      res.status(500).send('File could not be downloaded: ' + err);
-    }
-  });
-});
+
 
 
 const PORT = config.port;

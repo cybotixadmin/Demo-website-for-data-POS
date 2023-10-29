@@ -1,17 +1,80 @@
-
 const express = require('express');
 const axios = require('axios');
-
+const bodyParser = require('body-parser');
 const fs = require('fs');
 const http = require('http');
 // Read the configuration file once and store the data in memory
 const configFile = fs.readFileSync('./config.json');
 const config = JSON.parse(configFile);
 
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
+
 module.exports = function (app) {
 
-    app.get('/test1/', function (req, res) {
-        //...
+       /** create data request token */
+       app.post('/gui_user_create_custom_datarequest', urlencodedParser,(req, res) => {
+        try{
+        console.log('/gui_user_create_custom_datarequest');
+        console.log(req.method);
+        console.log(req.rawHeaders);
+        console.log("\n\nreq.body");
+        console.log(req.body);
+
+        console.log("dataaccessrequest");
+        console.log(req.body.dataaccessrequest);
+        var dr = req.body.dataaccessrequest;
+        console.log(dr);
+        console.log("dr");
+        console.log(dr.replace(/[\r\n]/g, ""));
+        console.log("dr2");
+        console.log(JSON.parse(dr.replace(/[\r\n]/g, "")));
+var dr_parsed = JSON.parse(dr.replace(/[\r\n]/g, ""));
+        console.log("platformtoken");
+        const platformtoken = req.body.platformtoken.replace(/[\r\n]/g, "").replace(/ /g, "");
+        console.log("platformtoken: " + platformtoken);
+
+        console.log("message");
+        console.log(req.body.messagetext);
+
+        // collect the information from the form
+
+
+data_request_message = {
+    messagetext: base64encode( req.body.messagetext),
+    requests: dr_parsed
+}
+console.log("data_request_message");
+console.log(data_request_message);
+console.log("data_request_message-str");
+console.log(JSON.stringify(data_request_message));
+
+
+ // attach the platform token to the response header. All request to the users must include the platform tkoken in the header.
+ res.setHeader('X_HTTP_CYBOTIX_PLATFORM_TOKEN', platformtoken);
+
+ // Attach the token containing the data access agreement that the site would like to establish with the user
+ // this is not the data request itself. That request comes later, and must be a subset of what is allowed by this agreement.
+ // res.setHeader('X_HTTP_CYBOTIX_QUERY_DATAAGREEMENT', 'e3sidXVpZCI6IjEyMzQ1Njc4OTBxd2VydHl5dSIsIm5hbWUiOiIiLH19fX0=');
+
+ // URL to which the response will be sent. This need not be part of the users visible site-navigation but rather take place in the background.
+ res.setHeader('X_HTTP_CYBOTIX_QUERY_REDIRECT', '/querydata_response_page');
+ // the data request message
+ // echo '{"messagetext":"Can we see \nyour click history for the past hour?","requests":[{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}},{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}}]}' | base64 | tr -d '\n'
+
+ res.setHeader('X_HTTP_CYBOTIX_DATA_REQUEST', base64encode(JSON.stringify(data_request_message)));
+
+ res.setHeader('Content-Type', 'text/html');
+
+ res.status(200);
+ res.send(querydata_redirect_page);
+
+
+        } catch (err) {
+            console.log(err);
+        }
+
     });
 
     const querydata_redirect_page = '<!DOCTYPE html><html lang="en">query data page</html>';
@@ -53,11 +116,11 @@ module.exports = function (app) {
      */
     const querydata_response_page = '<!DOCTYPE html><html lang="en"><title>data access token was received</title><body></body></html>';
     app.get('/querydata_response_page', (req, res) => {
-        console.log("querydata_response_page");
+        console.log("/querydata_response_page begin");
 
         try {
 
-            const platformtoken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmN5Ym90aXgubm8iLCJzdWIiOiJjb3JwIGluYyIsImF1ZCI6IkN5Ym90aXgiLCJrZXkiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cclxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwVElCM1Z0VmhDTUFKZ1hlZlc1T1xyXG4wNk4zVU5YY0VqSzNYYTNSd0Z1UDU2eDRTc2h5b05CVDFzOWtaY09wTGI5Wm5zWWxhMlVFYlRVSmpRT091T1JhXHJcbmFYT3hEbHF0ekVYc1BienNxTkhJRTZBVm1RTWFYK041VnlBVjBFM3IwaHNUL2lGUmJ5VXZSWTRGanpHMTdKeWVcclxuU0U2aWpveHpGNVpSN1RMdzgxZm1KUFIreTdFamtKQWEvNG54NWNEa3ZlNFdhZ0YyVVFlV3NzVG52RjlQUHNHelxyXG5RaktJZEpNYTdXbzF5RWJKSW5oUGUzWVNvOER4bnd0RzRHMnFYR29KK1FmeXRpTW1BeDZwL2puNW9vUCtzaWoxXHJcbmRydHRsS3BNRWg4WmtQZnpnNTNQYWt4OFdvOWpxWmNjOU1wYTZueVo4WmEwOVdWMWFyMzRhTXNPQ2JLdGFPSjZcclxuR1FJREFRQUJcclxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXHJcbiJdLCJqdGkiOiJhOTRhMzFkOC0wMDA5LTQwMzMtYTUwZi1kMWM3ZWUzYWU1OTAiLCJpYXQiOjE2OTgyNjM4NjUsIm5iZiI6MTY5ODI2Mzg2NSwiZXhwIjoxNzAwODU1ODY1fQ.B2SfzzvvJlqAKXFTuyy1FXwXWH9JPRJgFPCJ441vHw2JBnSDJApDtuE-ZzV2hPECjgEld58V-cgEmVXwq8oB8A'
+            const platformtoken = req.get('X_HTTP_CYBOTIX_PLATFORM_TOKEN');
 
             console.log("platformtoken: " + platformtoken);
 
