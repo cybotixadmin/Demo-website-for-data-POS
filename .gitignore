@@ -6,6 +6,8 @@ deployment/.terraform
 deployment/.aws
 deployment/*tfstate
 deployment/*hcl
+deployment/*bak
+
 node_modules
 
 notes.txt
