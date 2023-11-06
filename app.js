@@ -31,8 +31,15 @@ require('./routes/plugin')(app);
 require('./routes/serve_data')(app);
 
 
+// parse application/json
+app.use(bodyParser.json())
+
 try{
-  app.use(express.json());
+//  app.use(express.json());
+
+  // parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
 // parse application/x-www-form-urlencoded
  //app.use(bodyParser.urlencoded({ extended: false }));
  // parse application/json

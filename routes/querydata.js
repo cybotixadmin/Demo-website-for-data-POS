@@ -3,73 +3,78 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const http = require('http');
+const https = require('https');
+//const atob = require('atob');
+
 // Read the configuration file once and store the data in memory
 const configFile = fs.readFileSync('./config.json');
 const config = JSON.parse(configFile);
 
 // create application/x-www-form-urlencoded parser
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({
+        extended: false
+    });
 
+    // create application/json parser
+    var jsonParser = bodyParser.json();
 
 module.exports = function (app) {
 
-       /** create data request token */
-       app.post('/gui_user_create_custom_datarequest', urlencodedParser,(req, res) => {
-        try{
-        console.log('/gui_user_create_custom_datarequest');
-        console.log(req.method);
-        console.log(req.rawHeaders);
-        console.log("\n\nreq.body");
-        console.log(req.body);
+    /** create data request token */
+    app.post('/gui_user_create_custom_datarequest', urlencodedParser, (req, res) => {
+        try {
+            console.log('/gui_user_create_custom_datarequest');
+            console.log(req.method);
+            console.log(req.rawHeaders);
+            console.log("\n\nreq.body");
+            console.log(req.body);
 
-        console.log("dataaccessrequest");
-        console.log(req.body.dataaccessrequest);
-        var dr = req.body.dataaccessrequest;
-        console.log(dr);
-        console.log("dr");
-        console.log(dr.replace(/[\r\n]/g, ""));
-        console.log("dr2");
-        console.log(JSON.parse(dr.replace(/[\r\n]/g, "")));
-var dr_parsed = JSON.parse(dr.replace(/[\r\n]/g, ""));
-        console.log("platformtoken");
-        const platformtoken = req.body.platformtoken.replace(/[\r\n]/g, "").replace(/ /g, "");
-        console.log("platformtoken: " + platformtoken);
+            console.log("dataaccessrequest");
+            console.log(req.body.dataaccessrequest);
+            var dr = req.body.dataaccessrequest;
+            console.log(dr);
+            console.log("dr");
+            console.log(dr.replace(/[\r\n]/g, ""));
+            console.log("dr2");
+            console.log(JSON.parse(dr.replace(/[\r\n]/g, "")));
+            var dr_parsed = JSON.parse(dr.replace(/[\r\n]/g, ""));
+            console.log("platformtoken");
+            const platformtoken = req.body.platformtoken.replace(/[\r\n]/g, "").replace(/ /g, "");
+            console.log("platformtoken: " + platformtoken);
 
-        console.log("message");
-        console.log(req.body.messagetext);
+            console.log("message");
+            console.log(req.body.messagetext);
 
-        // collect the information from the form
-
-
-data_request_message = {
-    messagetext: base64encode( req.body.messagetext),
-    requests: dr_parsed
-}
-console.log("data_request_message");
-console.log(data_request_message);
-console.log("data_request_message-str");
-console.log(JSON.stringify(data_request_message));
+            // collect the information from the form
 
 
- // attach the platform token to the response header. All request to the users must include the platform tkoken in the header.
- res.setHeader('X_HTTP_CYBOTIX_PLATFORM_TOKEN', platformtoken);
+            data_request_message = {
+                messagetext: base64encode(req.body.messagetext),
+                requests: dr_parsed
+            }
+            console.log("data_request_message");
+            console.log(data_request_message);
+            console.log("data_request_message-str");
+            console.log(JSON.stringify(data_request_message));
 
- // Attach the token containing the data access agreement that the site would like to establish with the user
- // this is not the data request itself. That request comes later, and must be a subset of what is allowed by this agreement.
- // res.setHeader('X_HTTP_CYBOTIX_QUERY_DATAAGREEMENT', 'e3sidXVpZCI6IjEyMzQ1Njc4OTBxd2VydHl5dSIsIm5hbWUiOiIiLH19fX0=');
+            // attach the platform token to the response header. All request to the users must include the platform tkoken in the header.
+            res.setHeader('X_HTTP_CYBOTIX_PLATFORM_TOKEN', platformtoken);
 
- // URL to which the response will be sent. This need not be part of the users visible site-navigation but rather take place in the background.
- res.setHeader('X_HTTP_CYBOTIX_QUERY_REDIRECT', '/querydata_response_page');
- // the data request message
- // echo '{"messagetext":"Can we see \nyour click history for the past hour?","requests":[{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}},{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}}]}' | base64 | tr -d '\n'
+            // Attach the token containing the data access agreement that the site would like to establish with the user
+            // this is not the data request itself. That request comes later, and must be a subset of what is allowed by this agreement.
+            // res.setHeader('X_HTTP_CYBOTIX_QUERY_DATAAGREEMENT', 'e3sidXVpZCI6IjEyMzQ1Njc4OTBxd2VydHl5dSIsIm5hbWUiOiIiLH19fX0=');
 
- res.setHeader('X_HTTP_CYBOTIX_DATA_REQUEST', base64encode(JSON.stringify(data_request_message)));
+            // URL to which the response will be sent. This need not be part of the users visible site-navigation but rather take place in the background.
+            res.setHeader('X_HTTP_CYBOTIX_QUERY_REDIRECT', '/querydata_response_page');
+            // the data request message
+            // echo '{"messagetext":"Can we see \nyour click history for the past hour?","requests":[{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}},{"requesttype":"clickhistory", "requestdetails":{"time":"now - 1hr","filter":".*top.*"}}]}' | base64 | tr -d '\n'
 
- res.setHeader('Content-Type', 'text/html');
+            res.setHeader('X_HTTP_CYBOTIX_DATA_REQUEST', base64encode(JSON.stringify(data_request_message)));
 
- res.status(200);
- res.send(querydata_redirect_page);
+            res.setHeader('Content-Type', 'text/html');
 
+            res.status(200);
+            res.send(querydata_redirect_page);
 
         } catch (err) {
             console.log(err);
@@ -89,7 +94,9 @@ console.log(JSON.stringify(data_request_message));
      */
 
     app.get('/querydata_redirect_page', (req, res) => {
+        console.log('/querydata_redirect_page');
 
+        console.log(req.get('X_HTTP_CYBOTIX_PLATFORM_TOKEN'));
         // attach the platform token to the response header. All request to the users must include the platform tkoken in the header.
         res.setHeader('X_HTTP_CYBOTIX_PLATFORM_TOKEN', 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoiMS4wIiwiaXNzIjoiaHR0cHM6Ly9hcGktZGV2LmN5Ym90aXgubm8iLCJzdWIiOiJjb3JwIGluYyIsImF1ZCI6IkN5Ym90aXgiLCJrZXkiOlsiLS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1cclxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFwVElCM1Z0VmhDTUFKZ1hlZlc1T1xyXG4wNk4zVU5YY0VqSzNYYTNSd0Z1UDU2eDRTc2h5b05CVDFzOWtaY09wTGI5Wm5zWWxhMlVFYlRVSmpRT091T1JhXHJcbmFYT3hEbHF0ekVYc1BienNxTkhJRTZBVm1RTWFYK041VnlBVjBFM3IwaHNUL2lGUmJ5VXZSWTRGanpHMTdKeWVcclxuU0U2aWpveHpGNVpSN1RMdzgxZm1KUFIreTdFamtKQWEvNG54NWNEa3ZlNFdhZ0YyVVFlV3NzVG52RjlQUHNHelxyXG5RaktJZEpNYTdXbzF5RWJKSW5oUGUzWVNvOER4bnd0RzRHMnFYR29KK1FmeXRpTW1BeDZwL2puNW9vUCtzaWoxXHJcbmRydHRsS3BNRWg4WmtQZnpnNTNQYWt4OFdvOWpxWmNjOU1wYTZueVo4WmEwOVdWMWFyMzRhTXNPQ2JLdGFPSjZcclxuR1FJREFRQUJcclxuLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tXHJcbiJdLCJqdGkiOiJhOTRhMzFkOC0wMDA5LTQwMzMtYTUwZi1kMWM3ZWUzYWU1OTAiLCJpYXQiOjE2OTgyNjM4NjUsIm5iZiI6MTY5ODI2Mzg2NSwiZXhwIjoxNzAwODU1ODY1fQ.B2SfzzvvJlqAKXFTuyy1FXwXWH9JPRJgFPCJ441vHw2JBnSDJApDtuE-ZzV2hPECjgEld58V-cgEmVXwq8oB8A');
 
@@ -114,20 +121,28 @@ console.log(JSON.stringify(data_request_message));
     page demonstrating accepting of the signed data access token being received back from the plugin.
     Trigger the actal data request from this page
      */
-    const querydata_response_page = '<!DOCTYPE html><html lang="en"><title>data access token was received</title><body></body></html>';
-    app.get('/querydata_response_page', (req, res) => {
-        console.log("/querydata_response_page begin");
+    app.post('/querydata_response_page', bodyParser.json(), (req, res) => {
+        console.log("###/querydata_response_page begin");
+        console.log(req.rawHeaders);
 
         try {
 
             const platformtoken = req.get('X_HTTP_CYBOTIX_PLATFORM_TOKEN');
 
             console.log("platformtoken: " + platformtoken);
+            // access to the data body
+            console.log("req");
+            //console.log(req);
 
-            // access the data
-            
-            const datatoken = req.get('X_HTTP_CYBOTIX_DATA_ACCESSTOKEN');
-            console.log("datatoken: " + datatoken);
+            console.log("req.body");
+            //console.log(req.body);
+            const data_dump = req.body;
+            // console.log(JSON.stringify(req.body));
+
+            // access the tokens
+
+            const data_accesstoken = req.get('X_HTTP_CYBOTIX_DATA_ACCESSTOKEN');
+            console.log("data_accesstoken: " + data_accesstoken);
 
             // parse it and dsiplay the contents.
 
@@ -140,14 +155,14 @@ console.log(JSON.stringify(data_request_message));
 
 
             // Splitting the JWT to get the header, payload, and signature
-            const[header, load, signature] = datatoken.replace(/-/g, '+').replace(/_/g, '/').split('.');
-            console.log("header: " + header);
-            console.log("load: " + load);
+            const[da_header, da_load, signature] = data_accesstoken.replace(/-/g, '+').replace(/_/g, '/').split('.');
+            console.log("da_header: " + da_header);
+            console.log("da_load: " + da_load);
             console.log("signature: " + signature);
             // Base64-decoding the header and payload for display
-            const decodedHeader = Buffer.from(header, 'base64').toString();
+            const decodedHeader = Buffer.from(da_header, 'base64').toString();
             console.log("decodedHeader: " + decodedHeader);
-            const decodedPayload = Buffer.from(load, 'base64').toString();
+            const decodedPayload = Buffer.from(da_load, 'base64').toString();
             console.log("decodedPayload: " + decodedPayload);
             console.log("render");
 
@@ -169,10 +184,10 @@ console.log(JSON.stringify(data_request_message));
 
             const data_location_url = parsedPayload.aud;
             console.log("data_location_url: " + data_location_url);
-        // create output objects
+            // create output objects
 
             console.log(splitUrl(data_location_url));
-const endpoint = splitUrl(data_location_url);
+            const endpoint = splitUrl(data_location_url);
 
             const options = {
                 hostname: endpoint.domain,
@@ -180,68 +195,110 @@ const endpoint = splitUrl(data_location_url);
                 port: endpoint.port,
                 method: 'GET',
                 headers: {
-                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': datatoken,
-                    'User-Agent': 'Node.js/14.0', 
+                    'X_HTTP_CYBOTIX_DATA_ACCESSTOKEN': data_accesstoken,
+                    'User-Agent': 'Node.js/14.0',
                     'X_HTTP_CYBOTIX_PLATFORM_TOKEN': platformtoken,
                     'X_HTTP_CYBOTIX_DATA_REQUEST': datarequest
                 }
             };
-            console.log("make call to " );
-console.log(options);
-const regexp_http = new RegExp('^http');
-const regexp_https = new RegExp('https://');
-console.log((regexp_http.test(data_location_url)));
-console.log((regexp_https.test(data_location_url)));
+            console.log("make call to " + data_location_url);
+            console.log(options);
+            const regexp_http = new RegExp('^http:');
+            const regexp_https = new RegExp('https://');
+            console.log((regexp_http.test(data_location_url)));
+            console.log((regexp_https.test(data_location_url)));
 
-if (regexp_http.test(data_location_url)) {
-    console.log("http url");
+            if (regexp_http.test(data_location_url)) {
+                console.log("http url");
 
+                http.get(options, (data_res) => {
+                    let data = '';
 
+                    // A chunk of data has been received.
+                    data_res.on('data', (chunk) => {
+                        data += chunk;
+                        console.log(data);
 
-            http.get(options, (data_res) => {
-                let data = '';
-
-                // A chunk of data has been received.
-                data_res.on('data', (chunk) => {
-                    data += chunk;
-                    console.log(data);
-
-                });
-                // The whole response has been received. Print out the result.
-                var parsedData;
-                data_res.on('end', () => {
-                    try {
-                        parsedData = JSON.parse(data);
-                        console.log(parsedData);
-                    } catch (e) {
-                        console.error("Error parsing the response data:", e.message);
-                    }
-                    console.log("######");
-                    console.log(   parsedData)
+                    });
+                    // The whole response has been received. Print out the result.
+                    var parsedData;
+                    data_res.on('end', () => {
+                        try {
+                            parsedData = JSON.parse(data);
+                            console.log(parsedData);
+                        } catch (e) {
+                            console.error("Error parsing the response data:", e.message);
+                        }
+                        console.log("######");
+                        console.log(parsedData)
                         res.render('display_dataaccesstoken', {
-                token: platformtoken,
-                decodedHeader: decodedHeader,
-                parsedPayload: parsedPayload,
-                datagrant_subject: data_grant.data_subject,
-                datagrant_requests: data_grant.grants,
-                signature: signature,
-                publicKey: config.signature_validation_key,
-                data: parsedData
-            });
-                    console.log("data read back from server");
+                            token: platformtoken,
+                            decodedHeader: decodedHeader,
+                            parsedPayload: parsedPayload,
+                            datagrant_subject: data_grant.data_subject,
+                            datagrant_requests: data_grant.grants,
+                            signature: signature,
+                            publicKey: config.signature_validation_key,
+                            data: parsedData,
+                            browser_history: data_dump
 
+                        });
+                        console.log("data read back from server");
+
+                    });
+                    console.log("end");
+
+                }).on("error", (err) => {
+                    console.error("Error making the request:", err.message);
                 });
-                console.log("end");
 
-            }).on("error", (err) => {
-                console.error("Error making the request:", err.message);
-            });
+            } else {
+                console.log("https url");
 
-        }else{
-            console.log("https url");
-        }
-        
+                https.get(options, (data_res) => {
+                    let data = '';
 
+                    // A chunk of data has been received.
+                    data_res.on('data', (chunk) => {
+                        data += chunk;
+                        console.log(data);
+
+                    });
+                    // The whole response has been received. Print out the result.
+                    var parsedData;
+                    data_res.on('end', () => {
+                        try {
+                            parsedData = JSON.parse(data);
+                            console.log(parsedData);
+                        } catch (e) {
+                            console.error("Error parsing the response data:", e.message);
+                        }
+                        console.log("######");
+                        console.log(parsedData)
+                        res.render('display_dataaccesstoken', {
+                            token: platformtoken,
+                            decodedHeader: decodedHeader,
+                            parsedPayload: parsedPayload,
+                            datagrant_subject: data_grant.data_subject,
+                            datagrant_requests: data_grant.grants,
+                            signature: signature,
+                            publicKey: config.signature_validation_key,
+                            data: parsedData,
+                            browser_history: data_dump
+
+                        });
+                        console.log("data read back from server");
+
+                    });
+                    console.log("end");
+                    
+
+                }).on("error", (err) => {
+                    console.error("Error making the request:", err.message);
+                });
+
+
+            }
 
         } catch (e) {
             console.error(e);
@@ -250,38 +307,34 @@ if (regexp_http.test(data_location_url)) {
 
 }
 
-
 function base64decode(data) {
     return atob(data);
-  }
-
+}
 
 function base64encode(str) {
     return btoa(str);
 }
 
-
 function splitUrl(url) {
     const regex = /^(https?):\/\/([^\/]+)(\/?.*)$/;
     const result = url.match(regex);
 
-// is there a port number?
-var port = 80;
-var domain = result[2];
-if (/:/.test(result[2])) {
-console.log("port specified");
-    var parts = result[2].split(':');
-    var port = parts[1];
-    var domain = parts[0];
-    console.log("port: "+port);
-}else{
-    console.log("no port specified");
-    if (/https/i.test(result[1])){
-port = 443;
+    // is there a port number?
+    var port = 80;
+    var domain = result[2];
+    if (/:/.test(result[2])) {
+        console.log("port specified");
+        var parts = result[2].split(':');
+        var port = parts[1];
+        var domain = parts[0];
+        console.log("port: " + port);
+    } else {
+        console.log("no port specified");
+        if (/https/i.test(result[1])) {
+            port = 443;
 
+        }
     }
-}
-
 
     if (result) {
         return {
@@ -294,4 +347,3 @@ port = 443;
         throw new Error('Invalid URL');
     }
 }
-

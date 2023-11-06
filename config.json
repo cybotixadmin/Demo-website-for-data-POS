@@ -1,5 +1,5 @@
 {
-    "port": 3001,
+    "port": 3001 ,
     "signature_validation_key":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEJtdG5CNDrDFkgBrpVXYnzM+vv09q\nATno9Wd954UM62R0bov15Z1c8fVODhtxZu+7viimjwVXiHlZLYdjj0WY2g==\n-----END PUBLIC KEY-----"
 
 }

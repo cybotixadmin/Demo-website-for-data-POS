@@ -10,7 +10,8 @@ const serve_data_page='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8
 
 
 /*
-User's data can be stored anywhere. This interface 
+User's data can be stored anywhere. This interface is setup to carry out lookup in federated datastores based onthe audience field in the data access tokens.
+
  */
 
 app.get('/serve_data_page', (req, res) => {

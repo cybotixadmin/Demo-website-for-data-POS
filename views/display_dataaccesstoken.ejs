@@ -51,7 +51,7 @@ Validate the signature with the public key below
             <li>Paste the timestamp into the converter to see the corresponding date and time.</li>
         </ul>
 </ol>
-<p><strong>Data:</strong></p>
+<p><strong>Data retrieved from Cybotix repository:</strong></p>
 <% if(data && data.length > 0) { %>
 <table border="1">
   <!-- Table Header -->
@@ -78,6 +78,44 @@ Validate the signature with the public key below
 <% } else { %>
   No data returned.
  <% } %>
+
+
+ <p><strong>Data send from Cybotix plugin:</strong></p>
+ <% if(browser_history && browser_history.length > 0) { %>
+ <table border="1">
+   <!-- Table Header -->
+   
+   <thead>
+       <tr>
+        <th>URL</th>
+        <th>title</th>
+
+        <th>lastVisitTime</th>
+        <th>visitCount</th>
+        
+       </tr>
+   </thead>
+   <!-- Table Body -->
+   <tbody>
+    
+    
+ 
+     <% browser_history.forEach((item) => { %>
+       <tr>
+        <td><%= item.url %></td>
+        <td><%= item.title %></td>
+
+        <td><%= item.lastVisitTime %></td>
+        <td><%= item.visitCount %></td>
+        
+       </tr>
+   <% }); %>
+ </tbody>
+ </table>
+ <% } else { %>
+   No data returned.
+  <% } %>
+ 
 
 </body>
 </html>
